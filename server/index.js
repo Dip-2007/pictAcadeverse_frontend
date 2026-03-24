@@ -1,14 +1,14 @@
+import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-import dotenv from "dotenv";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import jwt from "jsonwebtoken";
 import Pyq from "./models/Pyq.js";
 import authRoutes from "./routes/authRoutes.js";
+import { admin } from "./middleware/authMiddleware.js";
 
-dotenv.config();
 const app = express();
 
 // CORS configuration - Allow frontend domains
@@ -80,8 +80,8 @@ app.get("/api/pyqs", async (req, res) => {
   }
 });
 
-// 2. UPLOAD PAPER (Protected - requires authentication)
-app.post("/api/pyqs", verifyToken, upload.single("file"), async (req, res) => {
+// 2. UPLOAD PAPER (Protected - requires authentication AND admin role)
+app.post("/api/pyqs", verifyToken, admin, upload.single("file"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 

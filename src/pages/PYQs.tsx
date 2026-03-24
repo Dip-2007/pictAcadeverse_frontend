@@ -83,6 +83,24 @@ const PYQs = () => {
   const [selectedYear, setSelectedYear] = useState("1");
   const [papers, setPapers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [bookmarkedPapers, setBookmarkedPapers] = useState<string[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("bookmarkedPapers");
+    if (saved) setBookmarkedPapers(JSON.parse(saved));
+  }, []);
+
+  const toggleBookmark = (e: React.MouseEvent, paperId: string) => {
+    e.stopPropagation();
+    const isBookmarked = bookmarkedPapers.includes(paperId);
+    const newBookmarks = isBookmarked
+      ? bookmarkedPapers.filter(id => id !== paperId)
+      : [...bookmarkedPapers, paperId];
+    setBookmarkedPapers(newBookmarks);
+    localStorage.setItem("bookmarkedPapers", JSON.stringify(newBookmarks));
+    if (isBookmarked) toast("Removed from bookmarks", { duration: 2000 });
+    else toast.success("Added to bookmarks", { duration: 2000 });
+  };
 
   // --- TAB STATE MANAGEMENT ---
   const [tabs, setTabs] = useState<{ id: number; file: any }[]>([{ id: Date.now(), file: null }]);
@@ -152,15 +170,21 @@ const PYQs = () => {
             key={paper._id}
             onClick={() => handleFileSelect(paper)}
             className={cn(
-              "flex items-center px-3 py-2 text-sm rounded-md transition-colors group text-left border border-transparent",
+              "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors group text-left border border-transparent",
               activeTab?.file?.url === paper.fileUrl
                 ? "bg-white/[0.08] text-white border-white/[0.05]"
                 : "text-neutral-400 hover:text-white hover:bg-white/[0.03]"
             )}
           >
             <FileText className="w-3.5 h-3.5 mr-2.5 text-indigo-400 shrink-0" />
-            <span className="truncate">{paper.title}</span>
-            <span className="ml-auto text-[10px] text-neutral-500 border border-white/[0.1] px-1.5 py-0.5 rounded">{paper.paperType}</span>
+            <span className="truncate flex-1">{paper.title}</span>
+            <span className="max-w-20 ml-2 truncate text-[10px] text-neutral-500 border border-white/[0.1] px-1.5 py-0.5 rounded mr-2">{paper.paperType}</span>
+            <div
+              onClick={(e) => toggleBookmark(e, paper._id)}
+              className="p-1 rounded hover:bg-white/[0.1] transition-colors flex-shrink-0"
+            >
+              <svg className={`w-3.5 h-3.5 ${bookmarkedPapers.includes(paper._id) ? "fill-yellow-500 text-yellow-500" : "text-neutral-500 hover:text-yellow-400"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+            </div>
           </button>
         ))}
       </div>
@@ -232,6 +256,118 @@ const PYQs = () => {
 
   const activeTab = tabs.find(t => t.id === activeTabId);
 
+  const renderSidebar = () => (
+    <div className="flex flex-col h-full overflow-hidden w-full bg-neutral-950/50">
+      {/* Year Selector */}
+      <div className="p-3 border-b border-white/[0.08] bg-neutral-950/80 backdrop-blur-md">
+        <div className="grid grid-cols-4 gap-1 p-1 bg-white/[0.03] rounded-lg border border-white/[0.05]">
+          {years.map((year) => (
+            <button
+              key={year.id}
+              onClick={() => setSelectedYear(year.id)}
+              className={cn(
+                "py-1.5 px-2 text-[10px] font-semibold rounded-md transition-all uppercase tracking-wider",
+                selectedYear === year.id
+                  ? "bg-white text-black shadow-sm"
+                  : "text-neutral-500 hover:text-neutral-300 hover:bg-white/[0.05]"
+              )}
+            >
+              {year.short}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Explorer Header */}
+      <div className="px-4 py-3 flex items-center justify-between border-b border-white/[0.05] shrink-0">
+        <span className="text-[10px] font-bold text-neutral-500 tracking-widest uppercase">
+          Subject Explorer
+        </span>
+        {loading && <Loader2 className="w-3 h-3 animate-spin text-neutral-500" />}
+      </div>
+
+      <ScrollArea className="flex-1">
+        <div className="py-2">{renderExplorerContent()}</div>
+      </ScrollArea>
+    </div>
+  );
+
+  const renderViewer = () => (
+    <div className="flex flex-col h-full bg-[#0c0c0c] relative w-full overflow-hidden">
+      {/* Tab Bar */}
+      <div className="h-10 bg-neutral-950 border-b border-white/[0.08] flex items-end px-2 shrink-0 gap-1 overflow-x-auto no-scrollbar">
+        {/* Mobile Back Button */}
+        <button
+          onClick={() => {
+            // Close active tab on mobile to return to explorer
+            if (activeTab) handleCloseTab({ stopPropagation: () => { } } as any, activeTab.id);
+          }}
+          className="md:hidden flex shrink-0 items-center justify-center mr-2 mb-1 px-2 h-8 rounded bg-white/5 border border-white/10 text-neutral-400 font-semibold text-xs"
+        >
+          ← Back
+        </button>
+
+        {tabs.map((tab) => (
+          <div
+            key={tab.id}
+            onClick={() => setActiveTabId(tab.id)}
+            className={cn(
+              "group relative flex shrink-0 items-center gap-2 px-3 py-2 min-w-[120px] max-w-[200px] h-9 text-xs font-medium rounded-t-lg cursor-pointer border border-b-0 transition-all select-none",
+              activeTabId === tab.id
+                ? "bg-[#0c0c0c] border-white/[0.08] text-white z-10 mt-[1px]"
+                : "bg-neutral-900 border-transparent text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300 mt-2"
+            )}
+          >
+            <FileText className={cn("w-3 h-3 shrink-0", activeTabId === tab.id ? "text-indigo-400" : "opacity-50")} />
+            <span className="truncate flex-1">{tab.file ? tab.file.title : "Welcome"}</span>
+            <div
+              onClick={(e) => handleCloseTab(e, tab.id)}
+              className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-white/[0.1] rounded transition-all text-neutral-400"
+            >
+              <X className="w-3 h-3" />
+            </div>
+          </div>
+        ))}
+
+        <button onClick={handleAddTab} className="h-6 w-6 flex shrink-0 items-center justify-center rounded-md hover:bg-white/[0.05] text-neutral-500 hover:text-white transition-colors ml-1 mb-1">
+          <Plus className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Viewer Content */}
+      <div className="flex-1 w-full h-full overflow-hidden flex flex-col items-center justify-center bg-[#0c0c0c] bg-[radial-gradient(#1a1a1a_1px,transparent_1px)] [background-size:20px_20px] relative">
+        {activeTab && activeTab.file ? (
+          isImage(activeTab.file.url) ? (
+            <img src={activeTab.file.url} alt="Paper" className="max-w-full max-h-full object-contain p-4 md:p-8" />
+          ) : (
+            <div className="relative w-full h-full overflow-hidden bg-white">
+              <div className="pointer-events-none absolute inset-0 z-50 flex flex-wrap items-center justify-center opacity-[0.05] select-none overflow-hidden mix-blend-multiply">
+                {Array.from({ length: 20 }).map((_, i) => (
+                  <span key={i} className="text-3xl md:text-5xl font-black text-black -rotate-45 whitespace-nowrap p-6 md:p-12">
+                    PICT-ACADVERSE
+                  </span>
+                ))}
+              </div>
+              {/* Mobile uses standard iframe since object tag is buggy on mobile PDF */}
+              <iframe src={`${activeTab.file.url}#toolbar=0`} className="w-full h-full border-0 block relative z-10" title="PDF Preview" />
+            </div>
+          )
+        ) : (
+          <div className="hidden md:flex flex-col items-center justify-center text-center p-8 max-w-md animate-in fade-in zoom-in-95 duration-500">
+            <div className="w-20 h-20 rounded-2xl bg-neutral-900/50 border border-white/[0.05] flex items-center justify-center mb-8 shadow-2xl relative">
+              <div className="absolute inset-0 bg-indigo-500/10 blur-xl rounded-full"></div>
+              <BookOpen className="w-8 h-8 text-neutral-400 relative z-10" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2 tracking-tight">Select a Document</h3>
+            <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
+              Choose a year and subject from the explorer sidebar to view Previous Year Questions.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-200 font-sans selection:bg-white/20 flex flex-col overflow-hidden relative">
       <Navbar />
@@ -239,118 +375,33 @@ const PYQs = () => {
       {/* Global Noise Overlay */}
       <div className="fixed inset-0 z-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
 
-      <div className="flex-1 flex pt-28 md:pt-32 h-screen overflow-hidden relative z-10 p-4 md:p-6 gap-6">
+      <div className="flex-1 flex pt-[84px] h-[calc(100vh-84px)] overflow-hidden relative z-10 p-0 md:px-2 md:pb-2">
 
-        {/* Mobile View Placeholder */}
-        <div className="md:hidden flex flex-col w-full h-full items-center justify-center p-6 text-center border border-white/[0.08] rounded-2xl bg-white/[0.02]">
-          <div className="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center mb-4">
-            <Monitor className="w-6 h-6 text-indigo-400" />
-          </div>
-          <h2 className="font-semibold text-lg mb-2 text-white">Desktop View Recommended</h2>
-          <p className="text-neutral-500 text-sm leading-relaxed">Please view on a larger screen to use the split-screen PDF viewer effectively.</p>
+        {/* Mobile Layout */}
+        <div className="md:hidden flex flex-col w-full h-full bg-neutral-950 border-t border-white/[0.05] overflow-hidden relative z-20">
+          {!activeTab?.file ? renderSidebar() : renderViewer()}
         </div>
 
         {/* Desktop View */}
-        <div className="hidden md:flex w-full flex-1 overflow-hidden rounded-2xl border border-white/[0.08] bg-neutral-900/50 backdrop-blur-sm shadow-2xl">
-          <ResizablePanelGroup direction="horizontal" className="h-full">
-
+        <div className="hidden md:flex w-full flex-1 overflow-hidden md:rounded-xl border border-white/[0.08] bg-neutral-900/50 backdrop-blur-sm shadow-2xl">
+          <ResizablePanelGroup direction="horizontal" className="h-full w-full">
             {/* COLUMN 1: Sidebar (Explorer) */}
-            <ResizablePanel defaultSize={22} minSize={18} maxSize={30} className="bg-neutral-950/50 flex flex-col h-full border-r border-white/[0.08]">
-
-              {/* Year Selector */}
-              <div className="p-3 border-b border-white/[0.08] bg-neutral-950/80 backdrop-blur-md">
-                <div className="grid grid-cols-4 gap-1 p-1 bg-white/[0.03] rounded-lg border border-white/[0.05]">
-                  {years.map((year) => (
-                    <button
-                      key={year.id}
-                      onClick={() => setSelectedYear(year.id)}
-                      className={cn(
-                        "py-1.5 px-2 text-[10px] font-semibold rounded-md transition-all uppercase tracking-wider",
-                        selectedYear === year.id
-                          ? "bg-white text-black shadow-sm"
-                          : "text-neutral-500 hover:text-neutral-300 hover:bg-white/[0.05]"
-                      )}
-                    >
-                      {year.short}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Explorer Header */}
-              <div className="px-4 py-3 flex items-center justify-between border-b border-white/[0.05]">
-                <span className="text-[10px] font-bold text-neutral-500 tracking-widest uppercase">
-                  Subject Explorer
-                </span>
-                {loading && <Loader2 className="w-3 h-3 animate-spin text-neutral-500" />}
-              </div>
-
-              <ScrollArea className="flex-1">
-                <div className="py-2">{renderExplorerContent()}</div>
-              </ScrollArea>
+            <ResizablePanel defaultSize={22} minSize={18} maxSize={40} className="w-full flex">
+              {renderSidebar()}
             </ResizablePanel>
 
-            <ResizableHandle withHandle className="bg-transparent border-r border-white/[0.08] w-[1px]" />
+
+
+            <ResizableHandle withHandle className="bg-transparent border-r border-white/[0.08] w-[1px] hidden md:flex" />
 
             {/* COLUMN 2: PDF Viewer */}
-            <ResizablePanel defaultSize={78} className="bg-[#0c0c0c] flex flex-col h-full relative">
-
-              {/* Tab Bar */}
-              <div className="h-10 bg-neutral-950 border-b border-white/[0.08] flex items-end px-2 shrink-0 gap-1">
-                {tabs.map((tab) => (
-                  <div
-                    key={tab.id}
-                    onClick={() => setActiveTabId(tab.id)}
-                    className={cn(
-                      "group relative flex items-center gap-2 px-3 py-2 min-w-[140px] max-w-[200px] h-9 text-xs font-medium rounded-t-lg cursor-pointer border-t border-x transition-all user-select-none",
-                      activeTabId === tab.id
-                        ? "bg-[#0c0c0c] border-white/[0.08] text-white border-b-transparent z-10 mt-[1px]"
-                        : "bg-neutral-900 border-transparent text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300 mt-2"
-                    )}
-                  >
-                    <FileText className={cn("w-3 h-3 shrink-0", activeTabId === tab.id ? "text-indigo-400" : "opacity-50")} />
-                    <span className="truncate flex-1">{tab.file ? tab.file.title : "Welcome"}</span>
-                    <div
-                      onClick={(e) => handleCloseTab(e, tab.id)}
-                      className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-white/[0.1] rounded transition-all text-neutral-400"
-                    >
-                      <X className="w-3 h-3" />
-                    </div>
-                  </div>
-                ))}
-
-                <button onClick={handleAddTab} className="h-6 w-6 flex items-center justify-center rounded-md hover:bg-white/[0.05] text-neutral-500 hover:text-white transition-colors ml-1 mb-1">
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Viewer Content */}
-              <div className="flex-1 relative w-full h-full overflow-hidden flex flex-col items-center justify-center bg-[#0c0c0c] bg-[radial-gradient(#1a1a1a_1px,transparent_1px)] [background-size:20px_20px]">
-                {activeTab && activeTab.file ? (
-                  isImage(activeTab.file.url) ? (
-                    <img src={activeTab.file.url} alt="Paper" className="max-w-full max-h-full object-contain p-8" />
-                  ) : (
-                    <iframe src={`${activeTab.file.url}#toolbar=0`} className="w-full h-full border-0 block bg-white" title="PDF Preview" />
-                  )
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-center p-8 max-w-md animate-in fade-in zoom-in-95 duration-500">
-                    <div className="w-20 h-20 rounded-2xl bg-neutral-900/50 border border-white/[0.05] flex items-center justify-center mb-8 shadow-2xl relative">
-                      <div className="absolute inset-0 bg-indigo-500/10 blur-xl rounded-full"></div>
-                      <BookOpen className="w-8 h-8 text-neutral-400 relative z-10" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2 tracking-tight">Select a Document</h3>
-                    <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
-                      Choose a year and subject from the explorer sidebar to view Previous Year Questions.
-                    </p>
-                  </div>
-                )}
-              </div>
-
+            <ResizablePanel defaultSize={78} className="flex h-full relative w-full">
+              {renderViewer()}
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

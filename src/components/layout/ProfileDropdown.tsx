@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuDescription } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Target } from "lucide-react";
+import { User, LogOut, Target, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -62,6 +62,15 @@ const ProfileDropdown = () => {
                         Progress Tracker
                     </DropdownMenuItem>
                 </Link>
+
+                {user?.role === "admin" && (
+                    <Link to="/admin">
+                        <DropdownMenuItem className="cursor-pointer font-medium text-indigo-500 hover:!bg-indigo-500/10 hover:!text-indigo-400 mt-1">
+                            <ShieldAlert className="w-4 h-4 mr-2" />
+                            Admin Vault Access
+                        </DropdownMenuItem>
+                    </Link>
+                )}
 
                 <DropdownMenuSeparator />
 

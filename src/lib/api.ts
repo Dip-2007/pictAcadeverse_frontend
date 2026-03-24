@@ -16,7 +16,11 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      if (config.headers && typeof config.headers.set === 'function') {
+        config.headers.set('Authorization', `Bearer ${token}`);
+      } else {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -53,6 +57,17 @@ export const authAPI = {
 
   googleLogin: async (token: string) => {
     const response = await api.post("/auth/google", { token });
+    return response.data;
+  },
+};
+
+export const pyqAPI = {
+  uploadPaper: async (formData: FormData) => {
+    const response = await api.post("/pyqs", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data;
   },
 };

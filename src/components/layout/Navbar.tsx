@@ -16,6 +16,8 @@ import ProfileDropdown from "./ProfileDropdown";
 import styled from "styled-components";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
+import { GlobalSearch } from "./GlobalSearch";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // ------------------------------------
 // 1. Data & Types
@@ -85,161 +87,161 @@ const Navbar = () => {
       {/* ========================================================
           MOBILE VIEW: TOP NOTCH & NOTCHED BOTTOM NAV
       ======================================================== */}
-      
+
       {/* 1. Mobile Top Notch (Branding) */}
       <div className="lg:hidden fixed top-0 left-1/2 -translate-x-1/2 z-50 w-full flex justify-center pointer-events-none">
         <div className="bg-[#0f0f10]/95 backdrop-blur-xl border-b border-x border-white/10 rounded-b-[24px] px-8 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.4)] pointer-events-auto mt-[-1px]">
-            <Link to="/home">
-              <LogoLoader>
-                <div className="loader" style={{ fontSize: '1.35rem', height: '2rem' }}>
-                  <p className="prefix">ACADVERSE-</p> 
-                  <div className="words">
-                    <span className="word">PYQ'S</span>
-                    <span className="word">UPDATES</span>
-                    <span className="word">NOTES</span>
-                    <span className="word">PYQ'S</span>
-                    <span className="word">UPDATES</span>
-                    <span className="word">NOTES</span>
-                  </div>
+          <Link to="/home">
+            <LogoLoader>
+              <div className="loader" style={{ fontSize: '1.35rem', height: '2rem' }}>
+                <p className="prefix">ACADVERSE-</p>
+                <div className="words">
+                  <span className="word">PYQ'S</span>
+                  <span className="word">UPDATES</span>
+                  <span className="word">NOTES</span>
+                  <span className="word">PYQ'S</span>
+                  <span className="word">UPDATES</span>
+                  <span className="word">NOTES</span>
                 </div>
-              </LogoLoader>
-            </Link>
-            <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+              </div>
+            </LogoLoader>
+          </Link>
+          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
         </div>
       </div>
 
       {/* 2. Mobile Bottom Notched Navbar & Circular Menu */}
       <div className="lg:hidden fixed bottom-6 inset-x-0 z-50 flex justify-center pointer-events-none">
-        
+
         {/* Navbar Container */}
         <div className="relative pointer-events-auto" style={{ width: NAV_WIDTH, height: NAV_HEIGHT }}>
-            
-            {/* A. Background with Notch Shape */}
-            <div 
-              className="absolute rounded-full inset-0 bg-[#0f0f10]/80 backdrop-blur-2xl"
-              style={{ clipPath: `path('${notchPath}')` }}
+
+          {/* A. Background with Notch Shape */}
+          <div
+            className="absolute rounded-full inset-0 bg-[#0f0f10]/80 backdrop-blur-2xl"
+            style={{ clipPath: `path('${notchPath}')` }}
+          />
+
+          {/* B. SVG Border Overlay */}
+          <svg
+            className="absolute inset-0 pointer-events-none"
+            width={NAV_WIDTH}
+            height={NAV_HEIGHT}
+          >
+            <path
+              d={notchPath}
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.1)"
+              strokeWidth="1"
             />
-            
-            {/* B. SVG Border Overlay */}
-            <svg 
-              className="absolute inset-0 pointer-events-none" 
-              width={NAV_WIDTH} 
-              height={NAV_HEIGHT}
-            >
-               <path 
-                 d={notchPath} 
-                 fill="none" 
-                 stroke="rgba(255, 255, 255, 0.1)" 
-                 strokeWidth="1"
-               />
-            </svg>
+          </svg>
 
-            {/* C. Circular Menu Items (The Orbit) */}
-            {/* We position this exactly where the Plus button is: left-1/2, top: -8 (relative to nav container) */}
-            <div className="absolute left-1/2 -top-8 -translate-x-1/2 z-10">
-               <AnimatePresence>
-                 {mobileNavOpen && navItems.map((item, index) => {
-                    // Logic to distribute items in a semi-circle (fan)
-                    const totalItems = navItems.length;
-                    // Angles: -60 (Left), 0 (Top), 60 (Right)
-                    const angleStep = 60; 
-                    const startAngle = -60;
-                    const angleDeg = startAngle + (index * angleStep);
-                    const angleRad = (angleDeg * Math.PI) / 180;
-                    
-                    const radius = 90; // Distance from center button
+          {/* C. Circular Menu Items (The Orbit) */}
+          {/* We position this exactly where the Plus button is: left-1/2, top: -8 (relative to nav container) */}
+          <div className="absolute left-1/2 -top-8 -translate-x-1/2 z-10">
+            <AnimatePresence>
+              {mobileNavOpen && navItems.map((item, index) => {
+                // Logic to distribute items in a semi-circle (fan)
+                const totalItems = navItems.length;
+                // Angles: -60 (Left), 0 (Top), 60 (Right)
+                const angleStep = 60;
+                const startAngle = -60;
+                const angleDeg = startAngle + (index * angleStep);
+                const angleRad = (angleDeg * Math.PI) / 180;
 
-                    // Calculate target position (0 is straight up for Y in math, but in CSS Y is inverted)
-                    // x = sin(angle) * r
-                    // y = -cos(angle) * r
-                    const targetX = Math.sin(angleRad) * radius;
-                    const targetY = -Math.cos(angleRad) * radius;
+                const radius = 90; // Distance from center button
 
-                    const Icon = item.icon;
-                    const isActive = location.pathname === item.href;
+                // Calculate target position (0 is straight up for Y in math, but in CSS Y is inverted)
+                // x = sin(angle) * r
+                // y = -cos(angle) * r
+                const targetX = Math.sin(angleRad) * radius;
+                const targetY = -Math.cos(angleRad) * radius;
 
-                    return (
-                       <Link 
-                         key={item.name} 
-                         to={item.href} 
-                         onClick={() => setMobileNavOpen(false)}
-                         className="absolute top-0 left-0" // anchor to center
-                       >
-                          <motion.div
-                             initial={{ x: 0, y: 0, scale: 0, opacity: 0 }}
-                             animate={{ 
-                               x: targetX, 
-                               y: targetY, 
-                               scale: 1, 
-                               opacity: 1 
-                             }}
-                             exit={{ x: 0, y: 0, scale: 0, opacity: 0 }}
-                             transition={{ 
-                               type: "spring", 
-                               stiffness: 300, 
-                               damping: 20,
-                               delay: index * 0.05 
-                             }}
-                             // Centering the bubble itself (-translate-x/y-1/2)
-                             className="w-12 h-12 -ml-6 -mt-6 rounded-full flex items-center justify-center bg-[#1a1a1d] border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
-                          >
-                             <Icon className={cn("w-5 h-5", isActive ? "text-blue-400" : "text-gray-400")} />
-                             
-                             {/* Floating Label below the bubble */}
-                             <motion.span 
-                               initial={{ opacity: 0, y: -5 }}
-                               animate={{ opacity: 1, y: 16 }} // Push text down
-                               className="absolute whitespace-nowrap text-[10px] font-medium text-white/80 bg-black/50 px-2 py-0.5 rounded-full backdrop-blur-sm"
-                             >
-                               {item.name}
-                             </motion.span>
+                const Icon = item.icon;
+                const isActive = location.pathname === item.href;
 
-                             {isActive && (
-                               <div className="absolute inset-0 rounded-full ring-2 ring-blue-500/30" />
-                             )}
-                          </motion.div>
-                       </Link>
-                    );
-                 })}
-               </AnimatePresence>
-            </div>
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    onClick={() => setMobileNavOpen(false)}
+                    className="absolute top-0 left-0" // anchor to center
+                  >
+                    <motion.div
+                      initial={{ x: 0, y: 0, scale: 0, opacity: 0 }}
+                      animate={{
+                        x: targetX,
+                        y: targetY,
+                        scale: 1,
+                        opacity: 1
+                      }}
+                      exit={{ x: 0, y: 0, scale: 0, opacity: 0 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 20,
+                        delay: index * 0.05
+                      }}
+                      // Centering the bubble itself (-translate-x/y-1/2)
+                      className="w-12 h-12 -ml-6 -mt-6 rounded-full flex items-center justify-center bg-[#1a1a1d] border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+                    >
+                      <Icon className={cn("w-5 h-5", isActive ? "text-blue-400" : "text-gray-400")} />
 
-            {/* D. Static Nav Buttons (Dashboard/Profile) */}
-            <div className="absolute inset-0 flex items-center justify-between px-6 z-10">
-                {/* Left: Dashboard */}
-                <div className="w-[60px] flex justify-center">
-                  <Link to="/dashboard" onClick={() => setMobileNavOpen(false)}>
-                      <div className={cn(
-                        "flex flex-col items-center justify-center h-12 w-12 rounded-full transition-colors duration-300",
-                        location.pathname === '/dashboard' ? "text-purple-400 bg-purple-500/10" : "text-gray-400 hover:text-white hover:bg-white/5"
-                      )}>
-                        <LayoutDashboard className="w-6 h-6" />
-                      </div>
+                      {/* Floating Label below the bubble */}
+                      <motion.span
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 16 }} // Push text down
+                        className="absolute whitespace-nowrap text-[10px] font-medium text-white/80 bg-black/50 px-2 py-0.5 rounded-full backdrop-blur-sm"
+                      >
+                        {item.name}
+                      </motion.span>
+
+                      {isActive && (
+                        <div className="absolute inset-0 rounded-full ring-2 ring-blue-500/30" />
+                      )}
+                    </motion.div>
                   </Link>
-                </div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
 
-                {/* Right: Profile */}
-                <div className="w-[60px] flex justify-center">
-                   <ProfileDropdown />
+          {/* D. Static Nav Buttons (Dashboard/Profile) */}
+          <div className="absolute inset-0 flex items-center justify-between px-6 z-10">
+            {/* Left: Dashboard */}
+            <div className="w-[60px] flex justify-center">
+              <Link to="/dashboard" onClick={() => setMobileNavOpen(false)}>
+                <div className={cn(
+                  "flex flex-col items-center justify-center h-12 w-12 rounded-full transition-colors duration-300",
+                  location.pathname === '/dashboard' ? "text-purple-400 bg-purple-500/10" : "text-gray-400 hover:text-white hover:bg-white/5"
+                )}>
+                  <LayoutDashboard className="w-6 h-6" />
                 </div>
+              </Link>
             </div>
 
-            {/* E. Center Plus Button (Main Trigger) */}
-            <div className="absolute left-1/2 -top-8 -translate-x-1/2 z-20">
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setMobileNavOpen(!mobileNavOpen)}
-                className="h-14 w-14 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 text-white flex items-center justify-center shadow-[0_4px_20px_rgba(37,99,235,0.5)] ring-2 ring-black/50"
+            {/* Right: Profile */}
+            <div className="w-[60px] flex justify-center">
+              <ProfileDropdown />
+            </div>
+          </div>
+
+          {/* E. Center Plus Button (Main Trigger) */}
+          <div className="absolute left-1/2 -top-8 -translate-x-1/2 z-20">
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setMobileNavOpen(!mobileNavOpen)}
+              className="h-14 w-14 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 text-white flex items-center justify-center shadow-[0_4px_20px_rgba(37,99,235,0.5)] ring-2 ring-black/50"
+            >
+              <div className="absolute inset-0 rounded-full border border-white/20" />
+              <motion.div
+                animate={{ rotate: mobileNavOpen ? 135 : 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
               >
-                <div className="absolute inset-0 rounded-full border border-white/20" />
-                <motion.div
-                  animate={{ rotate: mobileNavOpen ? 135 : 0 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                >
-                   <Plus className="w-7 h-7" />
-                </motion.div>
-              </motion.button>
-            </div>
+                <Plus className="w-7 h-7" />
+              </motion.div>
+            </motion.button>
+          </div>
 
         </div>
       </div>
@@ -249,21 +251,21 @@ const Navbar = () => {
           DESKTOP VIEW (Unchanged)
       ======================================================== */}
       <header className={cn(
-          "hidden lg:block fixed top-0 left-0 right-0 z-50 w-full px-4 pt-6"
+        "hidden lg:block fixed top-0 left-0 right-0 z-50 w-full px-4 pt-6"
       )}>
         <nav
           className={cn(
             "mx-auto transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] border border-transparent will-change-transform",
-            isScrolled 
-              ? "bg-black/60 backdrop-blur-md border-white/10 max-w-5xl rounded-full shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]" 
-              : "max-w-7xl bg-transparent"
+            isScrolled
+              ? "bg-black/10 backdrop-blur-md border-white/10 max-w-5xl rounded-full shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]"
+              : "bg-black/10 backdrop-blur-md border-white/10 max-w-7xl rounded-full shadow-lg"
           )}
         >
           <div className={cn(
-              "relative flex items-center justify-between px-6",
-              isScrolled ? "h-16" : "h-20"
+            "relative flex items-center justify-between px-6",
+            isScrolled ? "h-16" : "h-20"
           )}>
-            
+
             {/* LEFT: Logo Section */}
             <div className="flex-shrink-0 z-20">
               <Link to="/home" className="group block">
@@ -272,7 +274,7 @@ const Navbar = () => {
                     <LogoLoader>
                       <div className="loader">
                         <p className="prefix hidden sm:block">ACADVERSE-</p>
-                        <p className="prefix sm:hidden">PA-</p> 
+                        <p className="prefix sm:hidden">PA-</p>
                         <div className="words">
                           <span className="word">PYQ'S</span>
                           <span className="word">UPDATES</span>
@@ -289,7 +291,7 @@ const Navbar = () => {
             </div>
 
             {/* CENTER: Navigation (Ripple Buttons) */}
-            <div className="hidden lg:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 gap-3"> 
+            <div className="hidden lg:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 gap-3">
               {navItems.map((item) => {
                 const IconComponent = item.icon;
 
@@ -305,12 +307,12 @@ const Navbar = () => {
                         "hover:shadow-[0_0_20px_rgba(173,216,230,0.4)]"
                       )}
                     >
-                        <span className="relative z-10 block transition-all duration-300 ease-in-out group-hover:-translate-y-8 group-hover:opacity-0">
-                          {item.name}
-                        </span>
-                        <div className="absolute inset-0 flex items-center justify-center transition-all duration-300 ease-in-out translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
-                          <IconComponent className="w-4 h-4 text-blue-200 drop-shadow-[0_0_8px_rgba(147,197,253,0.8)]" />
-                        </div>
+                      <span className="relative z-10 block transition-all duration-300 ease-in-out group-hover:-translate-y-8 group-hover:opacity-0">
+                        {item.name}
+                      </span>
+                      <div className="absolute inset-0 flex items-center justify-center transition-all duration-300 ease-in-out translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
+                        <IconComponent className="w-4 h-4 text-blue-200 drop-shadow-[0_0_8px_rgba(147,197,253,0.8)]" />
+                      </div>
                     </RippleButton>
                   </Link>
                 );
@@ -318,7 +320,9 @@ const Navbar = () => {
             </div>
 
             {/* RIGHT: Dashboard, Profile */}
-            <div className="flex items-center gap-4 z-20">
+            <div className="flex items-center gap-2 lg:gap-4 z-20">
+              <GlobalSearch />
+              <ThemeToggle />
               <div className="hidden md:flex items-center gap-4">
                 <Link to="/dashboard">
                   <UniverseButtonWrapper>

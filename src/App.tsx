@@ -13,6 +13,7 @@ import Forum from "./pages/Forum";
 import Updates from "./pages/Updates";
 import NotFound from "./pages/NotFound";
 import AuthLanding from "./pages/AuthLanding";
+import Admin from "./pages/Admin";
 import TargetCursor from "./components/home/TargetCursor";
 
 function app() {
@@ -39,7 +40,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/pyqs" element={<PYQs />} />
           <Route path="/notes" element={<Notes />} />
-         
+          <Route path="/admin" element={<Admin />} />
           <Route path="/lab" element={<Lab />} />
           <Route path="/forum" element={<Forum />} />
           <Route path="/updates" element={<Updates />} />

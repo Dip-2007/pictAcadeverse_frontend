@@ -1071,7 +1071,7 @@ const ScrollDownIndicator = () => {
 
 const CosmicButton = () => {
   return (
-    <Link to="/vault" className="pointer-events-auto">
+    <Link to="/pyqs" className="pointer-events-auto">
       <motion.div
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}

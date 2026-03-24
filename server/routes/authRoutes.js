@@ -6,13 +6,11 @@ import User from "../models/user.js";
 
 const router = express.Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key"; // fallback for dev
-
 // Helper: Generate JWT
 const generateToken = (user) => {
   return jwt.sign(
     { id: user._id, email: user.email, role: user.role },
-    JWT_SECRET,
+    process.env.JWT_SECRET || "your_jwt_secret_key",
     { expiresIn: "7d" }
   );
 };

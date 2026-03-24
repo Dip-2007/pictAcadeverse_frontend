@@ -4,6 +4,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import Pyq from '../models/Pyq.js'; 
 import dotenv from 'dotenv';
+import { protect, admin } from '../middleware/authMiddleware.js';
 
 dotenv.config();
 
@@ -61,7 +62,7 @@ router.get('/', async (req, res) => {
 
 // --- 4. POST (Upload) Route ---
 // NOTE: 'file' must match formData.append('file', ...) on frontend
-router.post('/', upload.single('file'), async (req, res) => {
+router.post('/', protect, admin, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
