@@ -854,13 +854,13 @@ const Dashboard = () => {
             <div className="flex flex-col gap-6 h-full">
 
               {/* Row 1: Coming Soon Section */}
-              <div className="grid grid-cols-2 gap-4 h-1/2">
+              <div className="grid grid-cols-2 gap-4 min-h-[120px]">
                 <ComingSoonCard title="Countdown" icon={Clock} />
                 <ComingSoonCard title="Streaks" icon={Flame} />
               </div>
 
               {/* Row 2: REDESIGNED QUERY CARD - Compact & Contact Focused */}
-              <div className="h-1/2 relative group overflow-hidden rounded-3xl border border-white/10 bg-[#0f0c29]/40 backdrop-blur-xl p-5 hover:border-blue-500/30 transition-all shadow-xl flex flex-col justify-between">
+              <div className="relative group overflow-hidden rounded-3xl border border-white/10 bg-[#0f0c29]/40 backdrop-blur-xl p-5 hover:border-blue-500/30 transition-all shadow-xl flex flex-col justify-between min-h-[140px]">
                 {/* Decorative Glow */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[60px] rounded-full pointer-events-none -mr-10 -mt-10 transition-all group-hover:bg-blue-500/20" />
 

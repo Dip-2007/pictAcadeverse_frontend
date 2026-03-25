@@ -16,6 +16,7 @@ import {
 import {
   // Standard UI Icons
   FileText, Folder, Monitor, X, Loader2, BookOpen, Plus,
+  Bookmark, BookmarkCheck, ChevronLeft, GalleryVerticalEnd,
   // Subject Specific Icons
   Calculator, Atom, Bot, Zap, Terminal, FlaskConical, Palette,
   Code2, Leaf, Cpu, Wifi, Activity, BrainCircuit, Briefcase
@@ -105,6 +106,25 @@ const PYQs = () => {
   // --- TAB STATE MANAGEMENT ---
   const [tabs, setTabs] = useState<{ id: number; file: any }[]>([{ id: Date.now(), file: null }]);
   const [activeTabId, setActiveTabId] = useState(tabs[0].id);
+  // Mobile: toggle between explorer list and viewer
+  const [mobileView, setMobileView] = useState<'explorer' | 'viewer'>('explorer');
+  // Mobile viewer: auto-hide header for immersive reading
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const hideTimerRef = { current: null as ReturnType<typeof setTimeout> | null };
+
+  const startHideTimer = () => {
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    setHeaderVisible(true);
+    hideTimerRef.current = setTimeout(() => setHeaderVisible(false), 3000);
+  };
+
+  useEffect(() => {
+    if (mobileView === 'viewer') startHideTimer();
+    else {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      setHeaderVisible(true);
+    }
+  }, [mobileView]);
 
   // --- API CALLS ---
   const fetchPapers = async () => {
@@ -148,6 +168,7 @@ const PYQs = () => {
     setTabs(tabs.map(tab =>
       tab.id === activeTabId ? { ...tab, file: fileData } : tab
     ));
+    setMobileView('viewer'); // Switch to viewer on mobile when paper selected
   };
 
   // --- RENDERING HELPERS ---
@@ -293,18 +314,15 @@ const PYQs = () => {
   );
 
   const renderViewer = () => (
-    <div className="flex flex-col h-full bg-[#0c0c0c] relative w-full overflow-hidden">
+    <div className="flex flex-col w-full h-full bg-[#0c0c0c] relative overflow-hidden">
       {/* Tab Bar */}
-      <div className="h-10 bg-neutral-950 border-b border-white/[0.08] flex items-end px-2 shrink-0 gap-1 overflow-x-auto no-scrollbar">
+      <div className="h-10 bg-neutral-950 border-b border-white/[0.08] flex items-end px-2 shrink-0 gap-1 overflow-x-auto">
         {/* Mobile Back Button */}
         <button
-          onClick={() => {
-            // Close active tab on mobile to return to explorer
-            if (activeTab) handleCloseTab({ stopPropagation: () => { } } as any, activeTab.id);
-          }}
-          className="md:hidden flex shrink-0 items-center justify-center mr-2 mb-1 px-2 h-8 rounded bg-white/5 border border-white/10 text-neutral-400 font-semibold text-xs"
+          onClick={() => setMobileView('explorer')}
+          className="md:hidden flex shrink-0 items-center justify-center gap-1.5 mr-2 mb-1 px-3 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 font-semibold text-xs hover:bg-indigo-500/30 transition-colors"
         >
-          ← Back
+          ← Explorer
         </button>
 
         {tabs.map((tab) => (
@@ -377,9 +395,115 @@ const PYQs = () => {
 
       <div className="flex-1 flex pt-[84px] h-[calc(100vh-84px)] overflow-hidden relative z-10 p-0 md:px-2 md:pb-2">
 
-        {/* Mobile Layout */}
-        <div className="md:hidden flex flex-col w-full h-full bg-neutral-950 border-t border-white/[0.05] overflow-hidden relative z-20">
-          {!activeTab?.file ? renderSidebar() : renderViewer()}
+        {/* =============================================
+            MOBILE LAYOUT — Premium Full-Screen Viewer
+        ============================================= */}
+        <div className="md:hidden flex flex-col w-full h-full">
+          {mobileView === 'explorer' ? (
+            <div className="flex flex-col h-full w-full bg-neutral-950 border-t border-white/[0.05] overflow-hidden">
+              {renderSidebar()}
+            </div>
+          ) : (
+            /* Premium Viewer Overlay */
+            <div
+              className="fixed inset-0 z-[9999] flex flex-col bg-black"
+              style={{ animation: 'mobileSlideIn 0.28s cubic-bezier(0.32,0.72,0,1)' }}
+            >
+              <style>{`
+                @keyframes mobileSlideIn {
+                  from { transform: translateY(100%); opacity: 0.6; }
+                  to   { transform: translateY(0);    opacity: 1; }
+                }
+              `}</style>
+
+              {/* ── GRADIENT HEADER ── auto-hides, tap PDF to show */}
+              <div
+                style={{
+                  height: headerVisible ? '72px' : '0px',
+                  opacity: headerVisible ? 1 : 0,
+                  overflow: 'hidden',
+                  transition: 'height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease',
+                  flexShrink: 0,
+                  position: 'relative',
+                }}
+              >
+                {/* background gradient */}
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-900 via-violet-900 to-purple-900" />
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                {/* subtle shimmer line */}
+                <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-indigo-400/60 to-transparent" />
+
+                <div className="relative z-10 h-full flex items-center gap-3 px-4">
+                  {/* Back */}
+                  <button
+                    onClick={() => setMobileView('explorer')}
+                    className="flex shrink-0 items-center justify-center w-9 h-9 rounded-xl bg-white/10 border border-white/20 text-white active:scale-95 transition-transform"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  {/* Icon + Text */}
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="shrink-0 w-9 h-9 rounded-lg bg-indigo-500/30 border border-indigo-400/30 flex items-center justify-center">
+                      <GalleryVerticalEnd className="w-4 h-4 text-indigo-300" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-white truncate leading-tight">
+                        {activeTab?.file?.title ?? 'Viewing Paper'}
+                      </p>
+                      <p className="text-[11px] text-indigo-300/80 truncate">
+                        {activeTab?.file?.subject}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Bookmark toggle */}
+                  <button
+                    onClick={(e) => activeTab?.file && toggleBookmark(e, activeTab.file.url)}
+                    className="shrink-0 flex items-center justify-center w-9 h-9 rounded-xl bg-white/10 border border-white/20 text-white active:scale-95 transition-transform"
+                  >
+                    {activeTab?.file && bookmarkedPapers.includes(activeTab.file.url)
+                      ? <BookmarkCheck className="w-4 h-4 text-yellow-400" />
+                      : <Bookmark className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* ── PDF / IMAGE VIEWER — tap to show/hide header ── */}
+              <div
+                className="relative flex-1 bg-white overflow-hidden"
+                onTouchEnd={() => startHideTimer()}
+              >
+                {activeTab?.file && (
+                  isImage(activeTab.file.url) ? (
+                    <img
+                      src={activeTab.file.url}
+                      alt="Paper"
+                      className="absolute inset-0 w-full h-full object-contain bg-white"
+                    />
+                  ) : (
+                    <>
+                      {/* Watermark */}
+                      <div className="pointer-events-none absolute inset-0 z-10 flex flex-wrap items-center justify-center opacity-[0.035] select-none overflow-hidden mix-blend-multiply">
+                        {Array.from({ length: 15 }).map((_, i) => (
+                          <span key={i} className="text-2xl font-black text-black -rotate-45 whitespace-nowrap p-5">
+                            PICT-ACADVERSE
+                          </span>
+                        ))}
+                      </div>
+                      <iframe
+                        key={activeTab.file.url}
+                        src={`${activeTab.file.url}#toolbar=0&navpanes=0&view=FitH`}
+                        className="absolute inset-0 w-full h-full border-0"
+                        title="PDF Preview"
+                        allow="fullscreen"
+                      />
+                    </>
+                  )
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Desktop View */}

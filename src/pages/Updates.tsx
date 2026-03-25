@@ -123,7 +123,7 @@
 //             {updates.map((update, index) => {
 //               const Icon = getTypeIcon(update.type);
 //               const colorClass = getTypeColor(update.type);
-              
+
 //               return (
 //                 <Card 
 //                   key={update.id}
@@ -370,12 +370,12 @@
 //     className="relative group p-6 rounded-2xl bg-gradient-to-b from-white/[0.08] to-transparent border border-white/5 overflow-hidden hover:border-white/20 transition-all duration-500"
 //   >
 //     <div className={`absolute top-0 right-0 w-32 h-32 bg-${colorClass} opacity-10 blur-[50px] group-hover:opacity-20 transition-opacity`} />
-    
+
 //     <div className="relative z-10 flex flex-col h-full justify-between">
 //       <div className={`w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center mb-4 border border-white/10 group-hover:scale-110 transition-transform duration-500`}>
 //         <Icon className={`w-6 h-6 text-${colorClass}`} />
 //       </div>
-      
+
 //       <div>
 //         <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
 //         <p className="text-sm text-white/60">{subtitle}</p>
@@ -407,7 +407,7 @@
 //           opacity: 0.2;
 //         }
 //       `}</style>
-      
+
 //       {/* BACKGROUND LAYERS */}
 //       <div className="fixed inset-0 z-0 pointer-events-none">
 //         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(20,20,30,1)_0%,rgba(0,0,0,1)_100%)]" />
@@ -419,7 +419,7 @@
 
 //       <main className="relative z-10 pt-24 pb-20">
 //         <div className="container mx-auto px-6 max-w-7xl">
-          
+
 //           {/* HEADER SECTION */}
 //           <div className="text-center max-w-4xl mx-auto mb-16">
 //             <motion.div
@@ -570,7 +570,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   Download,
   ExternalLink,
   AlertTriangle,
@@ -596,9 +596,9 @@ const StyledBtnWrapper = styled.div<{ $isActive: boolean }>`
    color: ${props => props.$isActive ? '#000000' : '#ffffff'};
    
    /* BACKGROUND LOGIC: Active = White, Inactive = Zinc Gradient */
-   background: ${props => props.$isActive 
-     ? '#ffffff' 
-     : 'linear-gradient(30deg, #52525b, #71717a)'};
+   background: ${props => props.$isActive
+    ? '#ffffff'
+    : 'linear-gradient(30deg, #52525b, #71717a)'};
      
    border-radius: 12px;
    background-size: 100% auto;
@@ -868,7 +868,7 @@ const updates = [
     isNew: false,
     hasAttachment: true,
   },
-  
+
   // --- EVENTS ---
   {
     id: 3,
@@ -984,7 +984,7 @@ const CompactUpdateTable = ({ data, colorClass }: { data: any[], colorClass: any
                   {item.date}
                 </div>
               </TableCell>
-              
+
               <TableCell className="align-top py-3">
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
@@ -1028,7 +1028,7 @@ const UpdatesPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const getUpdates = (type: string) => {
-    return updates.filter(u => 
+    return updates.filter(u =>
       u.type === type && (u.years.includes(selectedYear) || u.years.includes("All"))
     );
   };
@@ -1069,7 +1069,7 @@ const UpdatesPage = () => {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-black text-white selection:bg-[#00ddeb]/30 overflow-x-hidden">
-      
+
       {/* GLOBAL BACKGROUND STYLES */}
       <style>
         {`
@@ -1099,52 +1099,52 @@ const UpdatesPage = () => {
 
       {/* FIXED BACKGROUND LAYER */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-black">
-         {/* Deep space radial gradient base */}
-         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,rgba(0,0,0,0)_80%)]" />
-         
-         {/* Static twinkling stars */}
-         <div className="stars-static absolute inset-0" />
-         
-         {/* Moving Shooting Stars - Layer 1 (Cyan Theme) */}
-         <ShootingStars
-           starColor="#00ddeb"
-           trailColor="#2EB9DF"
-           minSpeed={15}
-           maxSpeed={35}
-           minDelay={1000}
-           maxDelay={3000}
-         />
-         
-         {/* Moving Shooting Stars - Layer 2 (Purple Theme) */}
-         <ShootingStars
-           starColor="#af40ff"
-           trailColor="#5b42f3"
-           minSpeed={10}
-           maxSpeed={25}
-           minDelay={2000}
-           maxDelay={4000}
-         />
-         
-         {/* Moving Shooting Stars - Layer 3 (White/Blue Theme) */}
-         <ShootingStars
-           starColor="#ffffff"
-           trailColor="#00ddeb"
-           minSpeed={20}
-           maxSpeed={40}
-           minDelay={1500}
-           maxDelay={3500}
-         />
+        {/* Deep space radial gradient base */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,rgba(0,0,0,0)_80%)]" />
+
+        {/* Static twinkling stars */}
+        <div className="stars-static absolute inset-0" />
+
+        {/* Moving Shooting Stars - Layer 1 (Cyan Theme) */}
+        <ShootingStars
+          starColor="#00ddeb"
+          trailColor="#2EB9DF"
+          minSpeed={15}
+          maxSpeed={35}
+          minDelay={1000}
+          maxDelay={3000}
+        />
+
+        {/* Moving Shooting Stars - Layer 2 (Purple Theme) */}
+        <ShootingStars
+          starColor="#af40ff"
+          trailColor="#5b42f3"
+          minSpeed={10}
+          maxSpeed={25}
+          minDelay={2000}
+          maxDelay={4000}
+        />
+
+        {/* Moving Shooting Stars - Layer 3 (White/Blue Theme) */}
+        <ShootingStars
+          starColor="#ffffff"
+          trailColor="#00ddeb"
+          minSpeed={20}
+          maxSpeed={40}
+          minDelay={1500}
+          maxDelay={3500}
+        />
       </div>
 
       <Navbar />
 
       <main className="relative z-10 pt-24 pb-20">
         <div className="container mx-auto px-4 max-w-7xl">
-          
+
           {/* Header with Variable Proximity Effect */}
           <div className="text-center mb-10 space-y-2">
-            <h1 
-              className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-center max-w-5xl mx-auto cursor-default"
+            <h1
+              className="text-3xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-center max-w-5xl mx-auto cursor-default px-2"
               style={{ lineHeight: 1.1 }}
             >
               <VariableProximity
@@ -1161,11 +1161,11 @@ const UpdatesPage = () => {
           </div>
 
           {/* Styled Year Tabs (White Buttons) */}
-          <div className="flex justify-center mb-12">
-            <div className="flex gap-2 w-full max-w-2xl bg-white/5 p-2 rounded-2xl border border-white/10 backdrop-blur-md">
+          <div className="flex justify-center mb-12 px-2">
+            <div className="flex gap-2 w-full max-w-2xl bg-white/5 p-2 rounded-2xl border border-white/10 backdrop-blur-md overflow-x-auto">
               {yearOptions.map((year) => (
-                <StyledBtnWrapper 
-                  key={year.id} 
+                <StyledBtnWrapper
+                  key={year.id}
                   $isActive={selectedYear === year.id}
                   onClick={() => setSelectedYear(year.id)}
                 >
@@ -1179,50 +1179,50 @@ const UpdatesPage = () => {
 
           {/* 3-COLUMN GRID LAYOUT */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-            
+
             {/* COLUMN 1: EXAMS */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="flex flex-col"
             >
-              <ColumnHeader 
-                icon={AlertTriangle} 
-                title="Upcoming Exams" 
-                colorClass={themes.exam} 
+              <ColumnHeader
+                icon={AlertTriangle}
+                title="Upcoming Exams"
+                colorClass={themes.exam}
                 count={examData.length}
               />
               <CompactUpdateTable data={examData} colorClass={themes.exam} />
             </motion.div>
 
             {/* COLUMN 2: EVENTS */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="flex flex-col"
             >
-              <ColumnHeader 
-                icon={CalendarIcon} 
-                title="Events & Notices" 
-                colorClass={themes.event} 
+              <ColumnHeader
+                icon={CalendarIcon}
+                title="Events & Notices"
+                colorClass={themes.event}
                 count={eventData.length}
               />
               <CompactUpdateTable data={eventData} colorClass={themes.event} />
             </motion.div>
 
             {/* COLUMN 3: UPLOADS */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="flex flex-col"
             >
-              <ColumnHeader 
-                icon={FileText} 
-                title="Recent Uploads" 
-                colorClass={themes.upload} 
+              <ColumnHeader
+                icon={FileText}
+                title="Recent Uploads"
+                colorClass={themes.upload}
                 count={uploadData.length}
               />
               <CompactUpdateTable data={uploadData} colorClass={themes.upload} />
