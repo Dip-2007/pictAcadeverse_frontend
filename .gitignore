@@ -112,3 +112,6 @@ dist
 # Vite output
 dist-ssr
 *.local
+
+# Backend — kept in its own separate repo
+server/
