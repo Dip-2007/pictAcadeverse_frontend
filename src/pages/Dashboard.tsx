@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import { Progress } from "@/components/ui/progress";
@@ -17,9 +17,163 @@ import {
   Clock,
   Flame,
   Phone,
-  Sparkles,   // Added for new section
-  FileText    // Added for new section
+  Sparkles,
+  FileText
 } from "lucide-react";
+import {
+  motion,
+  useSpring,
+  useMotionValue,
+  type SpringOptions,
+  type Transition,
+  type HTMLMotionProps
+} from "motion/react";
+import { ShootingStars } from "@/components/ui/shooting-stars";
+import { cn } from '@/lib/utils';
+import { useTheme } from 'next-themes';
+
+// ==================================================================================
+// 1. CUSTOM STARS BACKGROUND
+// ==================================================================================
+
+type StarLayerProps = HTMLMotionProps<'div'> & {
+  count: number;
+  size: number;
+  transition: Transition;
+  starColor: string;
+};
+
+function generateStars(count: number, starColor: string) {
+  const shadows: string[] = [];
+  for (let i = 0; i < count; i++) {
+    const x = Math.floor(Math.random() * 4000) - 2000;
+    const y = Math.floor(Math.random() * 4000) - 2000;
+    shadows.push(`${x}px ${y}px ${starColor}`);
+  }
+  return shadows.join(', ');
+}
+
+function StarLayer({
+  count = 1000,
+  size = 1,
+  transition = { repeat: Infinity, duration: 50, ease: 'linear' },
+  starColor = '#fff',
+  className,
+  ...props
+}: StarLayerProps) {
+  const [boxShadow, setBoxShadow] = React.useState<string>('');
+
+  React.useEffect(() => {
+    setBoxShadow(generateStars(count, starColor));
+  }, [count, starColor]);
+
+  return (
+    <motion.div
+      animate={{ y: [-2000, 0] }}
+      transition={transition}
+      className={cn('absolute top-0 left-0 w-full h-[2000px]', className)}
+      {...props}
+    >
+      <div
+        className="absolute bg-transparent rounded-full"
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          boxShadow: boxShadow,
+        }}
+      />
+      <div
+        className="absolute bg-transparent rounded-full top-[2000px]"
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          boxShadow: boxShadow,
+        }}
+      />
+    </motion.div>
+  );
+}
+
+type StarsBackgroundProps = React.ComponentProps<'div'> & {
+  factor?: number;
+  speed?: number;
+  transition?: SpringOptions;
+  starColor?: string;
+  pointerEvents?: boolean;
+};
+
+function StarsBackground({
+  children,
+  className,
+  factor = 0.05,
+  speed = 60,
+  transition = { stiffness: 50, damping: 20 },
+  starColor = '#fff',
+  pointerEvents = true,
+  ...props
+}: StarsBackgroundProps) {
+  const offsetX = useMotionValue(0);
+  const offsetY = useMotionValue(0);
+
+  const springX = useSpring(offsetX, transition);
+  const springY = useSpring(offsetY, transition);
+
+  const handleMouseMove = React.useCallback(
+    (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const newOffsetX = -(e.clientX - centerX) * factor;
+      const newOffsetY = -(e.clientY - centerY) * factor;
+      offsetX.set(newOffsetX);
+      offsetY.set(newOffsetY);
+    },
+    [offsetX, offsetY, factor],
+  );
+
+  return (
+    <div
+      className={cn(
+        'relative size-full overflow-hidden bg-[radial-gradient(ellipse_at_bottom,_#1a1a1a_0%,_#000_100%)]',
+        className,
+      )}
+      onMouseMove={handleMouseMove}
+      {...props}
+    >
+      <motion.div
+        style={{ x: springX, y: springY }}
+        className={cn("w-full h-full", { 'pointer-events-none': !pointerEvents })}
+      >
+        <StarLayer
+          count={150}
+          size={1}
+          transition={{ repeat: Infinity, duration: speed, ease: 'linear' }}
+          starColor={starColor}
+        />
+        <StarLayer
+          count={50}
+          size={2}
+          transition={{
+            repeat: Infinity,
+            duration: speed * 0.8,
+            ease: 'linear',
+          }}
+          starColor={starColor}
+        />
+        <StarLayer
+          count={20}
+          size={3}
+          transition={{
+            repeat: Infinity,
+            duration: speed * 0.6,
+            ease: 'linear',
+          }}
+          starColor={starColor}
+        />
+      </motion.div>
+      {children}
+    </div>
+  );
+}
 
 // --- DATA SECTION --- 
 
@@ -268,6 +422,7 @@ const Dashboard = () => {
   const [selectedYear, setSelectedYear] = useState("2nd Year");
   const [activeBranch, setActiveBranch] = useState<string | null>(null);
   const [bookmarkedPapers, setBookmarkedPapers] = useState<any[]>([]);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     const saved = localStorage.getItem("bookmarkedPapers");
@@ -290,25 +445,54 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#020817] text-slate-100 font-sans selection:bg-purple-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-[#00ddeb]/30 overflow-x-hidden relative">
+      {/* GLOBAL BACKGROUND STYLES */}
+      <style>
+        {`
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+        `}
+      </style>
+
+      {/* FIXED BACKGROUND LAYER */}
+      <div className="absolute inset-0 z-0">
+        <StarsBackground
+          starColor={resolvedTheme === 'dark' ? '#fff' : '#fff'}
+          factor={0.02}
+          speed={80}
+          className={cn(
+            'absolute inset-0 flex items-center justify-center pointer-events-auto',
+            'bg-[radial-gradient(ellipse_at_bottom,_#1a1a1a_0%,_#000_100%)]'
+          )}
+        />
+        <div className="absolute inset-0 pointer-events-none mix-blend-screen">
+          <ShootingStars starColor="#00ddeb" trailColor="#2EB9DF" minSpeed={15} maxSpeed={35} minDelay={1000} maxDelay={3000} />
+        </div>
+        <div className="absolute inset-0 pointer-events-none mix-blend-screen">
+          <ShootingStars starColor="#af40ff" trailColor="#5b42f3" minSpeed={10} maxSpeed={25} minDelay={2000} maxDelay={4000} />
+        </div>
+        <div className="absolute inset-0 pointer-events-none mix-blend-screen">
+          <ShootingStars starColor="#ffffff" trailColor="#00ddeb" minSpeed={20} maxSpeed={40} minDelay={1500} maxDelay={3500} />
+        </div>
+      </div>
+
       <Navbar />
 
-      <main className="pt-24 pb-20">
-        <div className="container mx-auto px-4 max-w-7xl space-y-8">
+      <main className="relative z-10 pt-24 pb-20 pointer-events-none">
+        <div className="container mx-auto px-4 max-w-7xl space-y-8 pointer-events-auto">
 
           {/* --- SECTION 1: THE COMMAND CENTER --- */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in-up">
 
             {/* LEFT: Recently Added Updates (Spans 2 cols) */}
-            <div className="md:col-span-2 relative overflow-hidden rounded-3xl border border-white/10 bg-[#0f0c29]/40 backdrop-blur-xl p-6 hover:border-purple-500/30 transition-all duration-500 shadow-2xl flex flex-col">
-              <div className="absolute top-0 right-0 w-80 h-80 bg-purple-600/10 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none"></div>
+            <div className="md:col-span-2 relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-6 hover:border-[#956afa]/30 transition-all duration-500 shadow-2xl flex flex-col">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-[#956afa]/10 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none"></div>
 
               {/* Header */}
               <div className="flex items-center justify-between mb-5 relative z-10">
                 <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-purple-400" /> Recently Added
+                  <Sparkles className="w-5 h-5 text-[#956afa]" /> Recently Added
                 </h3>
-                <Link to="/pyqs" className="text-xs text-purple-400 hover:text-white flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
+                <Link to="/pyqs" className="text-xs text-[#956afa] hover:text-white flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
                   View All <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
@@ -369,9 +553,9 @@ const Dashboard = () => {
               </div>
 
               {/* Row 2: REDESIGNED QUERY CARD - Compact & Contact Focused */}
-              <div className="relative group overflow-hidden rounded-3xl border border-white/10 bg-[#0f0c29]/40 backdrop-blur-xl p-5 hover:border-blue-500/30 transition-all shadow-xl flex flex-col justify-between min-h-[140px]">
+              <div className="relative group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-5 hover:border-[#00ddeb]/30 transition-all shadow-xl flex flex-col justify-between min-h-[140px]">
                 {/* Decorative Glow */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[60px] rounded-full pointer-events-none -mr-10 -mt-10 transition-all group-hover:bg-blue-500/20" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#00ddeb]/10 blur-[60px] rounded-full pointer-events-none -mr-10 -mt-10 transition-all group-hover:bg-[#00ddeb]/20" />
 
                 {/* Header */}
                 <div className="flex items-start justify-between relative z-10">
@@ -399,7 +583,7 @@ const Dashboard = () => {
             </div>
 
             {/* Bottom Row - Bookmarks */}
-            <div className="md:col-span-3 rounded-3xl border border-white/10 bg-[#0f0c29]/40 backdrop-blur-xl p-6 flex flex-col group hover:border-yellow-500/30 transition-all shadow-xl relative overflow-hidden">
+            <div className="md:col-span-3 rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-6 flex flex-col group hover:border-[#956afa]/30 transition-all shadow-xl relative overflow-hidden">
               <div className="flex items-center gap-2 mb-4 relative z-10">
                 <Flame className="w-5 h-5 text-yellow-400 fill-yellow-400" />
                 <h3 className="text-xl font-bold text-white">Your Bookmarked Papers</h3>

@@ -185,19 +185,22 @@ const Navbar = () => {
                       // Centering the bubble itself (-translate-x/y-1/2)
                       className="w-12 h-12 -ml-6 -mt-6 rounded-full flex items-center justify-center bg-[#1a1a1d] border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
                     >
-                      <Icon className={cn("w-5 h-5", isActive ? "text-blue-400" : "text-gray-400")} />
+                      <Icon className={cn("w-5 h-5", isActive ? "text-[#956afa]" : "text-gray-400")} />
 
                       {/* Floating Label below the bubble */}
                       <motion.span
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 16 }} // Push text down
-                        className="absolute whitespace-nowrap text-[10px] font-medium text-white/80 bg-black/50 px-2 py-0.5 rounded-full backdrop-blur-sm"
+                        className={cn(
+                          "absolute whitespace-nowrap text-[10px] bg-black/50 px-2 py-0.5 rounded-full backdrop-blur-sm",
+                          isActive ? "text-[#956afa] font-bold" : "text-white/80 font-medium"
+                        )}
                       >
                         {item.name}
                       </motion.span>
 
                       {isActive && (
-                        <div className="absolute inset-0 rounded-full ring-2 ring-blue-500/30" />
+                        <div className="absolute inset-0 rounded-full ring-2 ring-[#956afa]/50" />
                       )}
                     </motion.div>
                   </Link>
@@ -294,24 +297,25 @@ const Navbar = () => {
             <div className="hidden lg:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 gap-3">
               {navItems.map((item) => {
                 const IconComponent = item.icon;
+                const isActive = location.pathname === item.href;
 
                 return (
                   <Link key={item.name} to={item.href}>
                     <RippleButton
-                      rippleColor="#ADD8E6"
+                      rippleColor={isActive ? "#956afa" : "#ADD8E6"}
                       className={cn(
-                        "group relative flex items-center justify-center min-w-[90px] h-10 rounded-full border border-transparent bg-transparent overflow-hidden",
-                        "text-gray-400 font-medium text-sm tracking-wide transition-all duration-300",
-                        "hover:bg-white/5",
-                        "hover:text-white",
-                        "hover:shadow-[0_0_20px_rgba(173,216,230,0.4)]"
+                        "group relative flex items-center justify-center min-w-[90px] h-10 rounded-full border bg-transparent overflow-hidden",
+                        "text-sm tracking-wide transition-all duration-300 hover:bg-white/5 hover:text-white",
+                        isActive
+                          ? "text-[#956afa] font-bold border-white/5 bg-white/[0.02]"
+                          : "text-gray-400 font-medium border-transparent hover:shadow-[0_0_20px_rgba(173,216,230,0.4)]"
                       )}
                     >
                       <span className="relative z-10 block transition-all duration-300 ease-in-out group-hover:-translate-y-8 group-hover:opacity-0">
                         {item.name}
                       </span>
                       <div className="absolute inset-0 flex items-center justify-center transition-all duration-300 ease-in-out translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
-                        <IconComponent className="w-4 h-4 text-blue-200 drop-shadow-[0_0_8px_rgba(147,197,253,0.8)]" />
+                        <IconComponent className={cn("w-4 h-4", isActive ? "text-[#956afa]" : "text-blue-200 drop-shadow-[0_0_8px_rgba(147,197,253,0.8)]")} />
                       </div>
                     </RippleButton>
                   </Link>

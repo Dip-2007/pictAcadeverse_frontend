@@ -461,6 +461,7 @@
 
 import React, { useRef, useState, useEffect, Children, cloneElement } from 'react';
 import { Link } from "react-router-dom";
+import styled from "styled-components";
 import {
   GraduationCap,
   Instagram,
@@ -742,12 +743,6 @@ const Footer = () => {
   return (
     <>
       <footer className="relative w-full border-t border-white/10 bg-black pt-16 pb-6 z-50 overflow-hidden">
-        
-        {/* --- Background Effects (INDIGO & CYAN) --- */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent opacity-100 shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[400px] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none mix-blend-screen" />
-        <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[300px] bg-cyan-500/10 blur-[100px] rounded-full pointer-events-none mix-blend-screen" />
-
         <div className="container relative mx-auto px-6 md:px-12 z-10">
           
           {/* TOP SECTION: BRAND - PLATFORM - FEEDBACK */}
@@ -758,13 +753,20 @@ const Footer = () => {
               
               {/* Brand Logo */}
               <Link to="/home" onClick={scrollToTop} className="flex items-center gap-3 group">
-                <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.05] group-hover:bg-indigo-500/10 group-hover:border-indigo-500/20 transition-all duration-500 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <GraduationCap className="h-6 w-6 text-white/90 group-hover:text-indigo-400 transition-colors relative z-10" />
-                </div>
-                <span className="text-xl font-bold tracking-wide text-white">
-                  PICT-ACADVERSE<span className="text-indigo-500">.</span>
-                </span>
+                <LogoLoader>
+                  <div className="loader">
+                    <p className="prefix hidden sm:block">ACADVERSE-</p>
+                    <p className="prefix sm:hidden">PA-</p>
+                    <div className="words">
+                      <span className="word">PYQ'S</span>
+                      <span className="word">UPDATES</span>
+                      <span className="word">NOTES</span>
+                      <span className="word">PYQ'S</span>
+                      <span className="word">UPDATES</span>
+                      <span className="word">NOTES</span>
+                    </div>
+                  </div>
+                </LogoLoader>
               </Link>
               
               <p className="text-slate-400 text-sm leading-relaxed max-w-sm font-light">
@@ -778,20 +780,19 @@ const Footer = () => {
                 Platform
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.8)]"></span>
               </h4>
-              <ul className="flex flex-col items-center space-y-3">
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-4 w-fit mx-auto">
                 {[
                   { name: 'Home', path: '/home' },
                   { name: 'PYQ Repository', path: '/pyqs' },
                   { name: 'Exam Updates', path: '/updates' },
                   { name: 'Dashboard', path: '/dashboard' }
                 ].map((item) => (
-                  <li key={item.name}>
+                  <li key={item.name} className="flex">
                     <Link
                       to={item.path}
                       onClick={scrollToTop}
-                      className="text-sm text-slate-400 hover:text-white transition-all duration-200 inline-flex items-center gap-2 group"
+                      className="w-full flex items-center justify-center text-center text-sm text-[#956afa] font-semibold border border-white/10 rounded-xl px-4 py-2 hover:bg-white/5 hover:border-white/20 transition-all duration-300"
                     >
-                      <span className="w-1 h-1 rounded-full bg-white/0 group-hover:bg-indigo-500 transition-colors"></span>
                       {item.name}
                     </Link>
                   </li>
@@ -869,7 +870,7 @@ const Footer = () => {
           {/* Bottom Bar */}
           <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-slate-500">
             <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-center md:text-left">
-              <p>© 2026 Acadverse. Made with <span className="text-indigo-500 animate-pulse">♥</span> for Engineers.</p>
+              <p>© 2026 Acadverse. <span className="font-bold text-[#956afa]">For PICTIANS</span></p>
               <span className="hidden md:inline text-white/10">|</span>
               <p className="text-slate-500/80 font-medium">Unofficial student initiative.</p>
             </div>
@@ -898,5 +899,74 @@ const Footer = () => {
     </>
   );
 };
+
+const LogoLoader = styled.div`
+  .loader {
+    color: hsl(var(--foreground)); 
+    font-family: inherit; 
+    font-weight: 700;
+    font-size: 1.25rem;
+    box-sizing: content-box;
+    height: 1.75rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .prefix {
+    margin: 0;
+    white-space: nowrap;
+    background: linear-gradient(110deg, #a1a1aa 45%, #ffffff 50%, #a1a1aa 55%);
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3.5s linear infinite;
+  }
+
+  .words {
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+    padding-left: 2px;
+    mask-image: linear-gradient(
+      transparent 0%,
+      black 20%,
+      black 80%,
+      transparent 100%
+    );
+  }
+
+  .word {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    white-space: nowrap;
+    font-weight: 800; 
+    background: linear-gradient(110deg, #956afa 45%, #ffffff 50%, #956afa 55%);
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: spin_logo 6s infinite cubic-bezier(0.23, 1, 0.32, 1.2), shimmer 3.5s linear infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  @keyframes spin_logo {
+    0% { transform: translateY(0); }
+    15% { transform: translateY(-100%); }
+    25% { transform: translateY(-100%); }
+    40% { transform: translateY(-200%); }
+    50% { transform: translateY(-200%); }
+    65% { transform: translateY(-300%); }
+    75% { transform: translateY(-300%); }
+    90% { transform: translateY(-400%); }
+    100% { transform: translateY(-400%); }
+  }
+`;
 
 export default Footer;

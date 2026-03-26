@@ -524,8 +524,161 @@ import {
   Calendar as CalendarIcon,
   Maximize2
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useSpring,
+  useMotionValue,
+  type SpringOptions,
+  type Transition,
+  type HTMLMotionProps
+} from "motion/react";
 import { ShootingStars } from "@/components/ui/shooting-stars";
+import { cn } from '@/lib/utils';
+import { useTheme } from 'next-themes';
+
+// ==================================================================================
+// 1. CUSTOM STARS BACKGROUND (Fixed Types, Reversed Direction, Low Density)
+// ==================================================================================
+
+type StarLayerProps = HTMLMotionProps<'div'> & {
+  count: number;
+  size: number;
+  transition: Transition;
+  starColor: string;
+};
+
+function generateStars(count: number, starColor: string) {
+  const shadows: string[] = [];
+  for (let i = 0; i < count; i++) {
+    const x = Math.floor(Math.random() * 4000) - 2000;
+    const y = Math.floor(Math.random() * 4000) - 2000;
+    shadows.push(`${x}px ${y}px ${starColor}`);
+  }
+  return shadows.join(', ');
+}
+
+function StarLayer({
+  count = 1000,
+  size = 1,
+  transition = { repeat: Infinity, duration: 50, ease: 'linear' },
+  starColor = '#fff',
+  className,
+  ...props
+}: StarLayerProps) {
+  const [boxShadow, setBoxShadow] = React.useState<string>('');
+
+  React.useEffect(() => {
+    setBoxShadow(generateStars(count, starColor));
+  }, [count, starColor]);
+
+  return (
+    <motion.div
+      animate={{ y: [-2000, 0] }}
+      transition={transition}
+      className={cn('absolute top-0 left-0 w-full h-[2000px]', className)}
+      {...props}
+    >
+      <div
+        className="absolute bg-transparent rounded-full"
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          boxShadow: boxShadow,
+        }}
+      />
+      <div
+        className="absolute bg-transparent rounded-full top-[2000px]"
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          boxShadow: boxShadow,
+        }}
+      />
+    </motion.div>
+  );
+}
+
+type StarsBackgroundProps = React.ComponentProps<'div'> & {
+  factor?: number;
+  speed?: number;
+  transition?: SpringOptions;
+  starColor?: string;
+  pointerEvents?: boolean;
+};
+
+function StarsBackground({
+  children,
+  className,
+  factor = 0.05,
+  speed = 60,
+  transition = { stiffness: 50, damping: 20 },
+  starColor = '#fff',
+  pointerEvents = true,
+  ...props
+}: StarsBackgroundProps) {
+  const offsetX = useMotionValue(0);
+  const offsetY = useMotionValue(0);
+
+  const springX = useSpring(offsetX, transition);
+  const springY = useSpring(offsetY, transition);
+
+  const handleMouseMove = React.useCallback(
+    (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const newOffsetX = -(e.clientX - centerX) * factor;
+      const newOffsetY = -(e.clientY - centerY) * factor;
+      offsetX.set(newOffsetX);
+      offsetY.set(newOffsetY);
+    },
+    [offsetX, offsetY, factor],
+  );
+
+  return (
+    <div
+      className={cn(
+        'relative size-full overflow-hidden bg-[radial-gradient(ellipse_at_bottom,_#1a1a1a_0%,_#000_100%)]',
+        className,
+      )}
+      onMouseMove={handleMouseMove}
+      {...props}
+    >
+      <motion.div
+        style={{ x: springX, y: springY }}
+        className={cn("w-full h-full", { 'pointer-events-none': !pointerEvents })}
+      >
+        <StarLayer
+          count={150}
+          size={1}
+          transition={{ repeat: Infinity, duration: speed, ease: 'linear' }}
+          starColor={starColor}
+        />
+        <StarLayer
+          count={50}
+          size={2}
+          transition={{
+            repeat: Infinity,
+            duration: speed * 0.8,
+            ease: 'linear',
+          }}
+          starColor={starColor}
+        />
+        <StarLayer
+          count={20}
+          size={3}
+          transition={{
+            repeat: Infinity,
+            duration: speed * 0.6,
+            ease: 'linear',
+          }}
+          starColor={starColor}
+        />
+      </motion.div>
+      {children}
+    </div>
+  );
+}
 
 // ==========================================
 // STYLED COMPONENT (Updated for White Theme)
@@ -972,6 +1125,7 @@ const CompactUpdateTable = ({ data, colorClass }: { data: any[], colorClass: any
 const UpdatesPage = () => {
   const [selectedYear, setSelectedYear] = useState("TE");
   const containerRef = useRef<HTMLDivElement>(null);
+  const { resolvedTheme } = useTheme();
 
   const getUpdates = (type: string) => {
     return updates.filter(u =>
@@ -1020,66 +1174,57 @@ const UpdatesPage = () => {
       <style>
         {`
         @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
-
-        .stars-static {
-          background-image: 
-            radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
-            radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
-            radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)),
-            radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
-            radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
-            radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0));
-          background-repeat: repeat;
-          background-size: 200px 200px;
-          animation: twinkle 5s ease-in-out infinite;
-          opacity: 0.3;
-        }
-
-        @keyframes twinkle {
-          0% { opacity: 0.3; }
-          50% { opacity: 0.6; }
-          100% { opacity: 0.3; }
-        }
         `}
       </style>
 
-      {/* FIXED BACKGROUND LAYER */}
-      <div className="fixed inset-0 z-0 pointer-events-none bg-black">
-        {/* Deep space radial gradient base */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,rgba(0,0,0,0)_80%)]" />
-
-        {/* Static twinkling stars */}
-        <div className="stars-static absolute inset-0" />
+      {/* 1. BLENDED BACKGROUND LAYER */}
+      <div className="absolute inset-0 z-0">
+        {/* Base Star Field (Interative) */}
+        <StarsBackground
+          starColor={resolvedTheme === 'dark' ? '#fff' : '#000'}
+          factor={0.02} // Sensitivity of hover movement
+          speed={80} // Slower speed for distant stars
+          className={cn(
+            'absolute inset-0 flex items-center justify-center pointer-events-auto', // pointer-events-auto here enables the hover effect
+            'bg-[radial-gradient(ellipse_at_bottom,_#1a1a1a_0%,_#000_100%)]',
+          )}
+        />
 
         {/* Moving Shooting Stars - Layer 1 (Cyan Theme) */}
-        <ShootingStars
-          starColor="#00ddeb"
-          trailColor="#2EB9DF"
-          minSpeed={15}
-          maxSpeed={35}
-          minDelay={1000}
-          maxDelay={3000}
-        />
+        <div className="absolute inset-0 pointer-events-none mix-blend-screen">
+          <ShootingStars
+            starColor="#00ddeb"
+            trailColor="#2EB9DF"
+            minSpeed={15}
+            maxSpeed={35}
+            minDelay={1000}
+            maxDelay={3000}
+          />
+        </div>
 
         {/* Moving Shooting Stars - Layer 2 (Purple Theme) */}
-        <ShootingStars
-          starColor="#af40ff"
-          trailColor="#5b42f3"
-          minSpeed={10}
-          maxSpeed={25}
-          minDelay={2000}
-          maxDelay={4000}
-        />
+        <div className="absolute inset-0 pointer-events-none mix-blend-screen">
+          <ShootingStars
+            starColor="#af40ff"
+            trailColor="#5b42f3"
+            minSpeed={10}
+            maxSpeed={25}
+            minDelay={2000}
+            maxDelay={4000}
+          />
+        </div>
 
         {/* Moving Shooting Stars - Layer 3 (White/Blue Theme) */}
-        <ShootingStars
-          starColor="#ffffff"
-          trailColor="#00ddeb"
-          minSpeed={20}
-          maxSpeed={40}
-          minDelay={1500}
-          maxDelay={3500}
-        />
+        <div className="absolute inset-0 pointer-events-none mix-blend-screen">
+          <ShootingStars
+            starColor="#ffffff"
+            trailColor="#00ddeb"
+            minSpeed={20}
+            maxSpeed={40}
+            minDelay={1500}
+            maxDelay={3500}
+          />
+        </div>
       </div>
 
       <Navbar />

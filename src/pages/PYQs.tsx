@@ -393,7 +393,7 @@ const PYQs = () => {
       {/* Global Noise Overlay */}
       <div className="fixed inset-0 z-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
 
-      <div className="flex-1 flex pt-[84px] h-[calc(100vh-84px)] overflow-hidden relative z-10 p-0 md:px-2 md:pb-2">
+      <div className="flex-1 flex pt-[84px] lg:pt-[110px] h-[calc(100vh-84px)] lg:h-[calc(100vh-110px)] overflow-hidden relative z-10 px-0 pb-0 md:px-2 md:pb-2">
 
         {/* =============================================
             MOBILE LAYOUT — Premium Full-Screen Viewer
