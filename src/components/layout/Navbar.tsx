@@ -1,7 +1,3 @@
-
-
-
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { RippleButton } from "@/components/ui/ripple-button";
@@ -42,8 +38,8 @@ const NAV_HEIGHT = 64;
 const CORNER_RADIUS = 32;
 
 // The geometry for the smooth notch
-const NOTCH_WIDTH = 120; // Width of the curve influence
-const NOTCH_DEPTH = 36; // How deep the notch goes relative to top edge
+const NOTCH_WIDTH = 120;
+const NOTCH_DEPTH = 36; 
 const cx = NAV_WIDTH / 2;
 
 // Smooth Bezier Notch Path
@@ -72,9 +68,12 @@ const Navbar = () => {
   const location = useLocation();
 
   const isLoginPage = location.pathname === '/';
-  if (isLoginPage) return null;
 
+  // Global horizontal scroll lock to prevent phantom bounding box issues on mobile
   useEffect(() => {
+    document.documentElement.style.overflowX = 'hidden';
+    document.body.style.overflowX = 'hidden';
+    
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
@@ -82,15 +81,19 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  if (isLoginPage) return null;
+
   return (
     <>
       {/* ========================================================
           MOBILE VIEW: TOP NOTCH & NOTCHED BOTTOM NAV
       ======================================================== */}
 
-      {/* 1. Mobile Top Notch (Branding) */}
-      <div className="lg:hidden fixed top-0 left-1/2 -translate-x-1/2 z-50 w-full flex justify-center pointer-events-none">
-        <div className="bg-[#0f0f10]/95 backdrop-blur-xl border-b border-x border-white/10 rounded-b-[24px] px-8 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.4)] pointer-events-auto mt-[-1px]">
+      {/* 1. Mobile Top Notch (Branding) 
+          FIXED: Swapped "left-1/2 w-full -translate-x-1/2" with "inset-x-0" to prevent horizontal overflow 
+      */}
+      <div className="lg:hidden fixed top-0 inset-x-0 z-50 flex justify-center pointer-events-none">
+        <div className="bg-[#0f0f10]/95 backdrop-blur-xl border-b border-x border-white/10 rounded-b-[24px] px-4 sm:px-8 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.4)] pointer-events-auto mt-[-1px] max-w-[95vw] overflow-hidden">
           <Link to="/home">
             <LogoLoader>
               <div className="loader" style={{ fontSize: '1.35rem', height: '2rem' }}>
@@ -114,7 +117,7 @@ const Navbar = () => {
       <div className="lg:hidden fixed bottom-6 inset-x-0 z-50 flex justify-center pointer-events-none">
 
         {/* Navbar Container */}
-        <div className="relative pointer-events-auto" style={{ width: NAV_WIDTH, height: NAV_HEIGHT }}>
+        <div className="relative pointer-events-auto max-w-[100vw]" style={{ width: NAV_WIDTH, height: NAV_HEIGHT }}>
 
           {/* A. Background with Notch Shape */}
           <div
@@ -137,23 +140,16 @@ const Navbar = () => {
           </svg>
 
           {/* C. Circular Menu Items (The Orbit) */}
-          {/* We position this exactly where the Plus button is: left-1/2, top: -8 (relative to nav container) */}
           <div className="absolute left-1/2 -top-8 -translate-x-1/2 z-10">
             <AnimatePresence>
               {mobileNavOpen && navItems.map((item, index) => {
-                // Logic to distribute items in a semi-circle (fan)
-                const totalItems = navItems.length;
-                // Angles: -60 (Left), 0 (Top), 60 (Right)
                 const angleStep = 60;
                 const startAngle = -60;
                 const angleDeg = startAngle + (index * angleStep);
                 const angleRad = (angleDeg * Math.PI) / 180;
 
-                const radius = 90; // Distance from center button
+                const radius = 90;
 
-                // Calculate target position (0 is straight up for Y in math, but in CSS Y is inverted)
-                // x = sin(angle) * r
-                // y = -cos(angle) * r
                 const targetX = Math.sin(angleRad) * radius;
                 const targetY = -Math.cos(angleRad) * radius;
 
@@ -161,49 +157,41 @@ const Navbar = () => {
                 const isActive = location.pathname === item.href;
 
                 return (
-                  <Link
+                  <motion.div
                     key={item.name}
-                    to={item.href}
-                    onClick={() => setMobileNavOpen(false)}
-                    className="absolute top-0 left-0" // anchor to center
+                    initial={{ x: 0, y: 0, scale: 0, opacity: 0 }}
+                    animate={{ x: targetX, y: targetY, scale: 1, opacity: 1 }}
+                    exit={{ x: 0, y: 0, scale: 0, opacity: 0 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 20,
+                      delay: index * 0.05
+                    }}
+                    className="absolute top-0 left-0" // The motion container acts as the anchor point
                   >
-                    <motion.div
-                      initial={{ x: 0, y: 0, scale: 0, opacity: 0 }}
-                      animate={{
-                        x: targetX,
-                        y: targetY,
-                        scale: 1,
-                        opacity: 1
-                      }}
-                      exit={{ x: 0, y: 0, scale: 0, opacity: 0 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 20,
-                        delay: index * 0.05
-                      }}
-                      // Centering the bubble itself (-translate-x/y-1/2)
-                      className="w-12 h-12 -ml-6 -mt-6 rounded-full flex items-center justify-center bg-[#1a1a1d] border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+                    <Link
+                      to={item.href}
+                      onClick={() => setMobileNavOpen(false)}
+                      className="absolute top-0 left-0 w-12 h-12 -ml-6 -mt-6 rounded-full flex flex-col items-center justify-center bg-[#1a1a1d] border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
                     >
                       <Icon className={cn("w-5 h-5", isActive ? "text-[#956afa]" : "text-gray-400")} />
 
-                      {/* Floating Label below the bubble */}
-                      <motion.span
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 16 }} // Push text down
+                      {/* FIXED: Swapped left-1/2 with inset-x-0 mx-auto w-fit to prevent phantom scrollbars */}
+                      <span
                         className={cn(
-                          "absolute whitespace-nowrap text-[10px] bg-black/50 px-2 py-0.5 rounded-full backdrop-blur-sm",
+                          "absolute -bottom-6 inset-x-0 mx-auto w-fit whitespace-nowrap text-[10px] bg-black/70 px-2 py-0.5 rounded-full backdrop-blur-md border border-white/10",
                           isActive ? "text-[#956afa] font-bold" : "text-white/80 font-medium"
                         )}
                       >
                         {item.name}
-                      </motion.span>
+                      </span>
 
                       {isActive && (
                         <div className="absolute inset-0 rounded-full ring-2 ring-[#956afa]/50" />
                       )}
-                    </motion.div>
-                  </Link>
+                    </Link>
+                  </motion.div>
                 );
               })}
             </AnimatePresence>
