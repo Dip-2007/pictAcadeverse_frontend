@@ -1,8 +1,9 @@
 import axios from "axios";
 
-// Use environment variable for production, fallback to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000" || "https://pictacadeverse-backend.onrender.com";
-
+// Fix for src/lib/api.ts
+// If you are in development, it uses localhost. If in production, it uses your Render URL.
+const isDevelopment = import.meta.env.MODE === 'development';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (isDevelopment ? "http://localhost:5000" : "https://pictacadeverse-backend.onrender.com");
 // Create axios instance with base URL
 const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,
