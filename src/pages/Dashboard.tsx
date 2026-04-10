@@ -477,7 +477,7 @@ const Dashboard = () => {
 
       <Navbar />
 
-      <main className="relative z-10 pt-24 pb-20 pointer-events-none">
+      <main className="relative z-10 pt-24 pb-40 lg:pb-20 pointer-events-none">
         <div className="container mx-auto px-4 max-w-7xl space-y-8 pointer-events-auto">
 
           {/* --- SECTION 1: THE COMMAND CENTER --- */}
@@ -500,13 +500,13 @@ const Dashboard = () => {
               {/* List */}
               <div className="space-y-3 relative z-10">
                 {/* Item 1 */}
-                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item cursor-default">
-                  <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item cursor-default overflow-hidden">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className="p-2.5 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/10">
                       <FileText className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-white group-hover/item:text-purple-200 transition-colors">End Sem 2024 - Data Structures</div>
+                      <div className="text-sm font-medium text-white group-hover/item:text-purple-200 transition-colors truncate">End Sem 2024 - Data Structures</div>
                       <div className="text-xs text-slate-400">Computer Engineering • SE</div>
                     </div>
                   </div>
@@ -520,7 +520,7 @@ const Dashboard = () => {
                       <FileText className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-white group-hover/item:text-blue-200 transition-colors">In Sem 2024 - Signals & Systems</div>
+                      <div className="text-sm font-medium text-white group-hover/item:text-blue-200 transition-colors truncate">In Sem 2024 - Signals & Systems</div>
                       <div className="text-xs text-slate-400">ENTC • SE</div>
                     </div>
                   </div>
@@ -534,7 +534,7 @@ const Dashboard = () => {
                       <FileText className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-white group-hover/item:text-pink-200 transition-colors">End Sem 2023 - Engineering Math III</div>
+                      <div className="text-sm font-medium text-white group-hover/item:text-pink-200 transition-colors truncate">End Sem 2023 - Engineering Math III</div>
                       <div className="text-xs text-slate-400">First Year • FE</div>
                     </div>
                   </div>

@@ -170,14 +170,14 @@ const AuthLanding = () => {
             >
                 <ContainerScroll
                     titleComponent={
-                        <div className="flex flex-col items-center justify-center min-h-[60vh] pb-20 pt-16">
+                        <div className="flex flex-col items-center justify-center min-h-[40vh] md:min-h-[60vh] pb-10 md:pb-20 pt-8 md:pt-16">
                             {/* Header Text */}
-                            <div className="mb-12 text-center">
+                            <div className="mb-6 md:mb-12 text-center">
                                 <div className="inline-flex items-center gap-2 mb-6">
                                     <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(99,102,241,0.5)]"></span>
                                     <span className="text-[10px] font-mono text-primary/80 tracking-widest uppercase">Welcome to PICT</span>
                                 </div>
-                                <h1 className="text-5xl md:text-8xl font-bold text-white tracking-tight mb-4 leading-[1.1]">
+                                <h1 className="text-4xl md:text-8xl font-bold text-white tracking-tight mb-4 leading-[1.1]">
                                     Acad<span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">verse</span>
                                 </h1>
                                 <p className="text-sm md:text-base text-neutral-400 font-light tracking-wide">
@@ -186,7 +186,7 @@ const AuthLanding = () => {
                             </div>
 
                             {/* Auth Forms */}
-                            <div className="w-full max-w-sm relative z-20">
+                            <div className="w-full max-w-[90vw] sm:max-w-sm relative z-20">
                                 <div className="relative group">
                                     <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-1000" />
                                     <Card className="bg-[#0A0A0A]/80 border-white/[0.08] shadow-2xl relative backdrop-blur-3xl">

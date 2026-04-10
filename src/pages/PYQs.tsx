@@ -25,9 +25,11 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 // --- Configuration ---
-const API_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL}/api/pyqs`
-  : "http://localhost:5000/api/pyqs";
+const API_BASE = import.meta.env.VITE_API_URL || 
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    ? "http://localhost:5000" 
+    : "https://pictacadeverse-backend.onrender.com");
+const API_URL = `${API_BASE}/api/pyqs`;
 
 // --- Data Definitions ---
 const years = [
@@ -308,7 +310,7 @@ const PYQs = () => {
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="py-2">{renderExplorerContent()}</div>
+        <div className="py-2 pb-36 lg:pb-2">{renderExplorerContent()}</div>
       </ScrollArea>
     </div>
   );

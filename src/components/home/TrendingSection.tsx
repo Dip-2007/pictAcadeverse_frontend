@@ -46,7 +46,7 @@ const topNotes = [
 
 const TrendingSection = () => {
   return (
-    <section className="py-16 md:py-24 bg-black overflow-hidden relative z-20">
+    <section className="py-16 md:py-24 pb-28 lg:pb-24 bg-black overflow-hidden relative z-20">
       <div className="container mx-auto px-4 md:px-8 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8">
           

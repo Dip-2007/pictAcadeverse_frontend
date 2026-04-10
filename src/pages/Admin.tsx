@@ -36,7 +36,7 @@ const branchSubjectsData: Record<string, Record<string, string[]>> = {
 
 const firstYearSubjects = [
   "Linear Algebra and Calculus (LAC)", "Quantum Physics (QP)", "Mechanics for Robotics (MFR)",
-  "Integrated Electrical and Electronics (IEEE)", "C Programming (CPPS)",
+  "Integrated Electrical and Electronics (IEEE)", "C Programming for Problem Solving (CPPS)",
   "Statistics and Integral Calculus (SIC)", "Chemical Science and Technology (CST)",
   "Computer Graphics and Design (CGD)", "OOP Using C++ (OOPC)", "Environment Engineering (ESE)"
 ];
